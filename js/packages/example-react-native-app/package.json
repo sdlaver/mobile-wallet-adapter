@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "sync-dev-deps": "mkdir -p ./node_modules/@solana-mobile && watchman-make --root ../mobile-wallet-adapter-protocol -p '**' --run '(cd ../example-react-native-app && ./scripts/sync-dev-dependencies.sh)'"
   },
   "dependencies": {
     "react": "18.0.0",
