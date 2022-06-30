@@ -11,6 +11,7 @@
     "sync-dev-deps": "mkdir -p ./node_modules/@solana-mobile && watchman-make --root ../mobile-wallet-adapter-protocol -p '**' --run '(cd ../example-react-native-app && ./scripts/sync-dev-dependencies.sh)'"
   },
   "dependencies": {
+    "@solana-mobile/mobile-wallet-adapter-protocol": "^0.0.1-alpha.0",
     "react": "18.0.0",
     "react-native": "0.69.0"
   },
@@ -48,6 +49,7 @@
   },
   "workspaces": {
     "nohoist": [
+      "@solana-mobile/mobile-wallet-adapter-protocol",
       "react-native",
       "react-native/**"
     ]
