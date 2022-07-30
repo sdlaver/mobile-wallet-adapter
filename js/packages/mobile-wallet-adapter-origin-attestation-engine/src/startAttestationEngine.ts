@@ -51,8 +51,8 @@ async function handleMessage(message: Message, attestee: ReturnType<typeof getAt
     }
 }
 
-export default async function startAttestationEngine(): Promise<boolean> {
-    const attestee = getAttestee();
+export default async function startAttestationEngine(eventTarget: Window | MessagePort): Promise<boolean> {
+    const attestee = getAttestee(eventTarget);
     attestee.sendMessage({ __type: OriginAttestationMessageType.EngineReady });
     while (
         // eslint-disable-next-line no-constant-condition

@@ -1,7 +1,7 @@
 import getDidTimeoutPromise from './getDidTimeoutPromise';
 import getPromiseForMessage from './getPromiseForMessage';
 import { OriginAttestationMessageType } from './messageTypes';
-import sendMessage from './sendMessage';
+import { sendMessageToWindow } from './sendMessage';
 import { Message } from './types';
 
 export default async function getAttestationEngine(attestationEngineEndpoint: URL, abortSignal: AbortSignal) {
@@ -27,7 +27,7 @@ export default async function getAttestationEngine(attestationEngineEndpoint: UR
         }
         contentWindow = frame.contentWindow;
         const engineReadyPromise = Promise.race([
-            getPromiseForMessage(contentWindow, OriginAttestationMessageType.EngineReady, abortSignal),
+            getPromiseForMessage(globalThis.window, contentWindow, OriginAttestationMessageType.EngineReady, abortSignal),
             getDidTimeoutPromise(contentWindow, abortSignal),
         ]);
         frame.src = attestationEngineEndpoint.toString();
@@ -39,10 +39,10 @@ export default async function getAttestationEngine(attestationEngineEndpoint: UR
                 messageType: TMessage,
                 abortSignal: AbortSignal,
             ): Promise<Extract<Message, { __type: TMessage }>> {
-                return getPromiseForMessage(contentWindow, messageType, abortSignal);
+                return getPromiseForMessage(globalThis.window, contentWindow, messageType, abortSignal);
             },
             sendMessage(message: Message) {
-                sendMessage(contentWindow, targetOrigin, message);
+                sendMessageToWindow(contentWindow, targetOrigin, message);
             },
         };
     } catch (e) {

@@ -1,0 +1,15 @@
+<script type="module">
+    import startAttestationEngine from '../lib/startAttestationEngine.js';
+
+    globalThis.window.addEventListener('message', initPort);
+
+    async function initPort(evt) {
+        if (evt.origin.startsWith('android-app://')) { // TODO: actually validate origin, format is, e.g. 'android-app://864c-66-75-236-62.ngrok.io/com.solana.ccttest'
+            try {
+                await startAttestationEngine(evt.ports[0]);
+            } catch(e) {
+                console.error(e);
+            }
+        }
+    }
+</script>

@@ -2,14 +2,15 @@ import { OriginAttestationMessageType } from './messageTypes';
 import { Message } from './types';
 
 export default async function getPromiseForMessage<TMessage extends OriginAttestationMessageType>(
-    contentWindow: Window,
+    eventTarget: EventTarget,
+    expectedMessageSource: MessageEventSource | null,
     messageType: TMessage,
     abortSignal: AbortSignal,
 ): Promise<Extract<Message, { __type: TMessage }>> {
     return new Promise((resolve, reject) => {
         function cleanup() {
             abortSignal.removeEventListener('abort', handleAbort);
-            globalThis.window.removeEventListener('message', handleMessage);
+            eventTarget.removeEventListener('message', handleMessage as EventListener);
         }
         function handleAbort() {
             cleanup();
@@ -17,14 +18,19 @@ export default async function getPromiseForMessage<TMessage extends OriginAttest
         }
         abortSignal.addEventListener('abort', handleAbort);
         function handleMessage(evt: MessageEvent) {
-            if (evt.source == null || evt.source !== contentWindow) {
+            if (evt?.source !== expectedMessageSource) {
                 return;
             }
-            if (evt.data.__type === messageType) {
+            const data = (typeof evt.data === 'string' ? JSON.parse(evt.data) : evt.data);
+            if (data.__type === messageType) {
                 cleanup();
-                resolve(evt.data);
+                resolve(data);
             }
         }
-        globalThis.window.addEventListener('message', handleMessage);
+        eventTarget.addEventListener('message', handleMessage as EventListener);
+        if ('start' in eventTarget) {
+            const messagePort = eventTarget as MessagePort
+            messagePort.start()
+        }
     });
 }
